@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
 )
@@ -93,7 +94,13 @@ func main() {
 
 	for _, s := range shapes {
 		if err := validateShape(s); err != nil {
-			fmt.Println("バリデーションエラー:", err)
+			var validationErr *ValidationError
+			if errors.As(err, &validationErr) {
+				fmt.Printf("バリデーションエラー: %s (Field: %s, Value: %v)\n",
+					validationErr.Message, validationErr.Field, validationErr.Value)
+			} else {
+				fmt.Println("バリデーションエラー:", err)
+			}
 		} else {
 			fmt.Printf("正常 - 面積: %.2f, 周長: %.2f\n", s.Area(), s.Perimeter())
 		}
